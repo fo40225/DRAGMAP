@@ -179,7 +179,23 @@ LDFLAGS += -L $(BOOST_LIBRARYDIR)
 endif
 LDFLAGS += $(BOOST_LIBRARIES:%=-lboost_%)
 
-CPPFLAGS += -msse4.2 -mavx2 
+#CPPFLAGS += -msse4.2 -mavx2 
+
+# gcc generic
+CPPFLAGS += -march=x86-64 
+
+# gcc avx2
+CPPFLAGS += -march=x86-64-v3 
+
+# gcc native
+CPPFLAGS += -march=native 
+
+# icc avx512
+CPPFLAGS += -xSKYLAKE-AVX512 
+
+# icc native
+CPPFLAGS += -xHOST 
+
 ifdef DEBUG
 CPPFLAGS += -O0 -ggdb3 -femit-class-debug-always -fno-omit-frame-pointer
 ifeq ($(DEBUG),glibc)
@@ -195,10 +211,17 @@ else # non DEBUG
 #CPPFLAGS += -O3 -march=skylake-avx512 # same as above
 
 # this seems to be fastest for fastq parsing. mainly because it manages to put proper PSUBB instruction for subtracing q0 from qscore chars
-CPPFLAGS += -g -O2 -ftree-vectorize -finline-functions -fpredictive-commoning -fgcse-after-reload -funswitch-loops -ftree-slp-vectorize -fvect-cost-model -fipa-cp-clone -ftree-phiprop
+#CPPFLAGS += -g -O2 -ftree-vectorize -finline-functions -fpredictive-commoning -fgcse-after-reload -funswitch-loops -ftree-slp-vectorize -fvect-cost-model -fipa-cp-clone -ftree-phiprop
 
 # this seems slightly slower than above
 #CXXFLAGS += -g -mavx2 -O2 -ftree-vectorize -finline-functions -fpredictive-commoning -fgcse-after-reload -funswitch-loops -ftree-slp-vectorize -fvect-cost-model -fipa-cp-clone -ftree-phiprop
+
+# gcc
+CPPFLAGS += -O3 -ftree-vectorize -fvect-cost-model=cheap 
+
+# icc
+CPPFLAGS += -O3 
+
 endif # if DEBUG
 
 ifdef ASAN
